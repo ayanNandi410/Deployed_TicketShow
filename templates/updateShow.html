@@ -1,0 +1,238 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Update Show{% endblock %}
+
+{% block head %}
+<style>
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  {% for category, message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+        <strong class="me-auto text-white">Update Show</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {{ message }}
+      </div>
+    </div>            
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="body">
+
+    <div class="container h-custom">
+        <h2>Update existing Show</h2><hr/><br/>
+      <div class="d-flex justify-content-center align-items-center h-100">
+
+          <form class="mt-4" action="/admin/show/update" method="post" onsubmit="return formValidate();">  
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" name="showName">Name</span>
+                        <input type="text" class="form-control" name="showName" id="showName" 
+                        placeholder="Show Name" value="{{ sname }}" aria-label="Show Name" readonly>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 mb-3">
+                    <div class="input-group input-group-md">
+                        <span class="input-group-text">Initial Rating</span>
+                        <input type="number" class="form-control" name="showRating" id="showRating" 
+                        placeholder="Out of 10" aria-label="Show Rating" required>
+                        <div id="ratingCheck" class="invalid-feedback">&emsp;Invalid value for rating</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="input-group input-group-md">
+                        <span class="input-group-text">Tags</span>
+                        <div class="form-control">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagAction" name="tags" value="Action">
+                                <label class="form-check-label" for="Action"> Action</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagThriller" name="tags" value="Thriller">
+                                <label for="Thriller" class="form-check-label"> Thriller</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagComedy" name="tags" value="Comedy">
+                                <label for="Comedy" class="form-check-label"> Comedy</label>    
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagHorror" name="tags" value="Horror">
+                                <label class="form-check-label" for="Horror"> Horror</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagMystery" name="tags" value="Mystery">
+                                <label for="Mystery" class="form-check-label"> Mystery</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagFantasy" name="tags" value="Fantasy">
+                                <label for="Fantasy" class="form-check-label"> Fantasy</label>    
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="TagDrama" name="tags" value="Drama">
+                                <label for="Drama" class="form-check-label"> Drama</label>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tagCheck" class="invalid-feedback">&emsp;One tag must be selected</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="input-group input-group-md">
+                        <span class="input-group-text">Languages</span>
+                        <div class="form-control">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="LangEnglish" name="languages" value="English">
+                                <label class="form-check-label" for="English"> English</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="LangHindi" name="languages" value="Hindi">
+                                <label for="Hindi" class="form-check-label"> Hindi</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="LangBengali" name="languages" value="Bengali">
+                                <label for="Bengali" class="form-check-label"> Bengali</label>    
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="LangTamil" name="languages" value="Tamil">
+                                <label class="form-check-label" for="Tamil"> Tamil</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="LangTelegu" name="languages" value="Telegu">
+                                <label for="Telegu" class="form-check-label"> Telegu</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" 
+                                id="LangMalayalam" name="languages" value="Malayalam">
+                                <label for="Malayalam" class="form-check-label"> Malayalam</label>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="langCheck" class="invalid-feedback">&emsp;One Language must be selected</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" >Duration</span>
+                        <input type="text" class="form-control" name="showDuration" 
+                        id="showDuration" placeholder="2 hrs 3 min" aria-label="Show Duration" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 offset-5">
+                    <button type="submit" class="btn btn-primary btn-md"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Update Show</button>
+                </div>
+            </div>
+  
+          </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function formValidate(){
+        let result = true;
+
+        let rating = document.getElementById('showRating');
+        if((rating.value>10) ||(rating.value<0))
+        {
+            document.getElementById('ratingCheck').style.display = "block";
+            result = false;
+        }
+        else{
+            document.getElementById('ratingCheck').style.display = "none";
+        }
+
+
+        let tags = document.getElementsByName('tags');
+        let count = 0;
+        for(var i=0; tags[i]; ++i)
+        {
+            if(tags[i].checked)
+            {
+                count++;
+                break;
+            }
+        }
+        if(count==0)
+        {
+            document.getElementById('tagCheck').style.display = "block";
+            result = false;
+        }
+        else{
+            document.getElementById('tagCheck').style.display = "none";
+        }
+
+        let lngs = document.getElementsByName('languages');
+        count = 0;
+        for(var i=0; lngs[i]; ++i)
+        {
+            if(lngs[i].checked)
+            {
+                count++;
+                break;
+            }
+        }
+        if(count==0)
+        {
+            document.getElementById('langCheck').style.display = "block";
+            result = false;
+        }
+        else{
+            document.getElementById('langCheck').style.display = "none";
+        }
+
+        return result;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Venues Dashboard{% endblock %}
+
+{% block searchBar %}
+<form class="d-md-flex" role="search" action="/user/searchVenueByName" method="post" style="margin: 4px auto;">
+  <input class="form-control form-control-sm me-2" name="searchVenueName" type="search" placeholder="Search for venues" aria-label="Search">
+  <button class="btn btn-sm btn-outline-success" type="submit">Search</button>
+</form>
+{% endblock %}
+
+{% block content %}
+
+<div class="body container" style="margin-bottom: 20%;">
+    <div class="row">
+      <div class="col-12 col-sm-4">
+        {% if name is not defined %}
+          <h2>Venues {% if city is defined %}<span class="badge bg-secondary bg-success">in {{ city }}</span>{% endif %}</h2><br/>
+        {% else %}
+          <h2>Search Results for {{ name }}:</h2>
+        {% endif %}
+      </div>  
+    </div>
+    <br/><br/>
+    {% if noVenue is defined %}
+      <br/><h2 class="alert alert-primary text-center">No venue available</h2>
+    {% else%}
+    <div class="row row-cols-md-3 row-cols-sm-1 g-3">    
+    {% for venue in venues %}
+    <div class="col">
+      <div class="card p-3" style="width: 18rem; margin-right: 20px;">
+        <div class="card-img-caption d-flex flex-row-reverse">
+          <span class="card-text badge rounded-pill bg-primary">Capacity : {{ venue['capacity'] }}</span>
+          <img src="{{ url_for('static',filename='movieHall.png')}}" class="card-img-top blurImage" height="200px" width="30px" alt="...">
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ venue['name'] }}</h5>
+          <p class="card-text">
+            <span class="badge rounded-pill bg-secondary" style="padding: 8px 10px;">{{ venue['location'] }}</span>
+          </p>   
+          <form method="post" action="/user/venueHome">
+              <input type="number" name="vid" value="{{ venue['id'] }}" style="display: none;">
+              <button type="submit" class="btn btn-primary">Explore</a>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var myModal = new bootstrap.Modal(document.getElementById('cityModal'), {})
+  //myModal.toggle()
+</script>
+{% endblock %}

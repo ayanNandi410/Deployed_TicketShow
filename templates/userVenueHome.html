@@ -1,0 +1,67 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Venue Home{% endblock %}
+
+{% block head %}
+<style>
+    .offcanvas{
+        min-height: 90%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="body vh-100">
+<div class="container py-5 col-8">
+    <h1 class="display-5 fw-bold">{{ venue['name'] }}</h1>
+    <p class="col-md-8 fs-4">{{ venue['description'] }}</p>
+    <button class="btn btn-primary btn-md" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">View all shows</button>
+</div>
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasBottomLabel">Available shows</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    {% if showListEmpty is defined %}
+        <br/><br/><br/>
+        <div class="col-6 justify-content-center" style="margin: auto;">
+          <h3 class="alert alert-primary mb-4 text-center">No Shows Available</h3>
+        </div>
+    {% else %}
+      <div class="row row-cols-1 row-cols-sm-4 g-4">
+        {% for show in shows %}
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ show['name'] }}</h5><br/>
+              <div class="card-text">
+                <!-- <br/>Ticket Price : &nbsp;&#8377;{{ show['ticketPrice'] }}<br/>  -->
+                <div class="ratings" style="padding: 3px 5px;">
+                  {% for i in range(1,6) %}
+                    {% if(i <= (show['rating']/2)) %}
+                      <i class="fa fa-star rating-color"></i>
+                    {% else %}
+                      <i class="fa fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                {% for tagItem in show['tags'] %}
+                <span class="badge bg-secondary">{{ tagItem['name'] }}</span>&nbsp;
+                {% endfor %}<br/>
+                {% for tagItem in show['languages'] %}
+                <span class="badge bg-success">{{ tagItem['name'] }}</span>&nbsp;
+                {% endfor %}
+              </div><br/>
+              <a href="/user/bookTimeslot/?show={{ show['name'] }}&vid={{ venue['id'] }}" class="btn btn-primary">Buy Tickets</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+  </div>
+</div>
+</div>
+{% endblock %}

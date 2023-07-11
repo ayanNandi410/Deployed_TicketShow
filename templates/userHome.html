@@ -1,0 +1,60 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Venue Home{% endblock %}
+
+{% block head %}
+<style>
+    .offcanvas{
+        min-height: 80%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+            <strong class="me-auto text-white">Result</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>            
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+<!--Choose City Modal -->
+<div class="modal fade in" tabindex="-1" id="cityModal" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Choose City</h5>
+        </div>
+        <div class="modal-body">
+          {% for c in cities %}
+            <a href="/user/venuesByCity/{{ c['city'] }}" class="btn btn-primary">{{ c['city'] }}</a>&emsp;
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+</div>
+<div class="body vh-100">
+  <div class="container py-5 col-8">
+    <h1 class="display-5 fw-bold">Welcome {{ user['name'] }}</h1>
+    <p class="col-md-8 fs-4">You have reached a place where you can explore all venues available in your City
+      and book your favourite show as well. You may use the links available at the top to begin your journey.
+    </p>
+    <div class="mt-3">
+      <button class="btn btn-primary btn-md" type="button" 
+      data-bs-toggle="modal" data-bs-target="#cityModal">See Venues</button> 
+    </div>
+</div>
+</div>
+{% endblock %}

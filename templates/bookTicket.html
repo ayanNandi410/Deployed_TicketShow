@@ -1,0 +1,157 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Buy Tickets{% endblock %}
+
+{% block head %}
+<style>
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+            <strong class="me-auto text-white">Book Ticket</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>            
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+<div class="body" style="margin-top: 10%; margin-bottom: 10%;">
+    {% if response is defined %}
+        {% if response == 'Success' %}
+            <p class="alert alert-warning" role="alert" style="padding: 10px 20px;">Successfully added</p>
+        {% else %}
+            <p class="alert alert-warning" role="alert" style="padding: 10px 20px;">{{ response['error_code'] }} , 
+                {{ response['error_message'] }}</p>
+        {% endif %}
+    {% endif %}
+    <div class="container h-custom">
+        <h2>Choose Seats and Book Tickets</h2><hr/><br/>
+      <div class="d-flex justify-content-center align-items-center h-100">
+
+          <form class="mt-4" action="/user/bookTicket/" method="post" enctype=multipart/form-data>  
+            <!-- Name input -->
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text" name="venueName">Venue</span>
+                        <input type="text" class="form-control disable" name="venueName" 
+                        id="venueName" aria-label="venue" value="{{ details.venue }}">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text">Show </span>
+                        <input type="text" class="form-control disable" name="showName" 
+                        id="showName" value="{{ details.show }}" aria-label="showName">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text">Date</span>
+                        <input type="date" class="form-control disable" name="date" 
+                        id="date" aria-label="date" value="{{ details.date }}">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6">
+                        <div class="input-group input-group-lg mb-3">
+                            <span class="input-group-text" >Time</span>
+                            <input type="time" class="form-control disable" name="time" 
+                            id="timeslot" aria-label="timeslot" value="{{ details.time }}"> 
+                        </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text">Number of Seats</span>
+                        <input type="number" class="form-control" name="allocSeats" 
+                        id="allocSeats" aria-label="allocSeats" onclick="disableSubmit();" required>
+                    </div>
+                </div>
+                
+                <div class="col-12 col-sm-6">
+                        <div class="input-group input-group-lg mb-3">
+                            <span class="input-group-text" >Total Price (&#x20B9;)</span>
+                            <input type="text" class="form-control disable" name="totPrice" 
+                            id="totPrice" aria-label="totPrice"> (excluding GST)
+                        </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="text-center">
+                    <button type="button" data-columns="1" data-price="{{ details.price }}" class="btn btn-sm btn-primary btn-lg" onclick="setPrice();"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Get Total Cost</button>
+                </div>
+            </div>
+            <br/>
+            <div class="row mb-3">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-md btn-success btn-lg" id="submitBtn"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem;" onselect="alertCost();"
+                    disabled>Book Tickets</button>
+                </div>
+            </div>
+  
+          </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function setPrice() {
+  const numSeats = document.getElementById('allocSeats');
+  if(numSeats.value == ""){
+    alert("Enter some value...");
+  } 
+  else{
+    priceInput = event.target;
+    totPrice = priceInput.dataset.price;
+  document.getElementById('submitBtn').disabled = false;
+  let num = parseInt(numSeats.value);
+  priceElm = document.getElementById('totPrice')
+  priceElm.value = (parseFloat(totPrice) * num).toFixed(2).toString();
+  }
+  }
+
+  function disableSubmit(){
+    document.getElementById('submitBtn').disabled = true;
+  }
+
+  function alertCost(){
+    alert("Get Total Cost first!!!");
+  }
+</script>
+{% endblock %}

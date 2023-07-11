@@ -1,0 +1,157 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Timings{% endblock %}
+
+
+
+{% block content %}
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Timing</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="deleteModalBody">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <a href="#" id="alcDeleteBt" class="btn btn-primary">Delete Timing</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container body">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+            <strong class="me-auto text-white">Delete Timing</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>            
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+        
+    
+
+    <div class="container">
+      <div class="row">
+        <div class="d-flex flex-row-reverse">
+          <a href="{{ url_for('admin.showVenues')}}" class="btn btn-primary mb-3">Go Back</a>
+        </div>
+      </div>
+          <div class="d-flex justify-content-center">
+            <h4 class="alert alert-primary text-center" style="width: 100%;">Timeslots</h4>
+          </div>
+            <br/>
+            <div class="row text-center">
+              <div class="col-12 col-sm-6">
+                <h5 class="alert alert-success">Show : {{ show }}</h5>
+              </div>
+              <div class="col-12 col-sm-6">
+                <h5 class="alert alert-success">Venue : {{ venue }}</h5>
+              </div>
+            </div>
+            <hr/>
+            <div class="container">
+                <form action="/admin/getAllocations?show={{ show }}&vid={{ vid }}&venue={{ venue }}" method="post">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-12 col-sm-2">
+                            <h4> Enter Range : </h4>
+                        </div>
+                        <div class="col-12 col-sm-3">
+                            <div class="input-group input-group-md">
+                                <span class="input-group-text">Start Date</span>
+                                <input type="date" class="form-control" name="startDate" 
+                                id="startDate" aria-label="date" value="{{ sDate }}" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-3">
+                            <div class="input-group input-group-md">
+                                <span class="input-group-text">End Date</span>
+                                <input type="date" class="form-control" name="endDate" 
+                                id="endDate" aria-label="date" value="{{ eDate }}" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-2">
+                            <button type="submit" class="btn btn-success">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <hr/><br/><br/>
+            {% if emptyAlloc is defined %}
+            <div class="d-flex justify-content-center">
+              <h2 class="alert alert-primary text-center" style="width: 60%;">No slots alloted</h2>
+            </div>
+            {% else %}
+            <div class="list-group">
+                {% for alloc in allocations %}
+                <div href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between mb-3">
+                      <h5 class="mb-1">Date : {{ alloc['date'] }}</h5>
+                      <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                        onclick="deleteAlloc();" data-colums="1" data-sdate="{{ alloc['date'] }}"
+                        data-stime="{{ alloc['time'] }}" data-avseats="{{ alloc['avSeats'] }}" 
+                        data-sid="{{ alloc['id'] }}" data-show="{{ show }}" data-venue="{{ venue }}" data-vid="{{ alloc['venue_id']}}">Delete Timing</button>
+                    </div>
+                    <div class="d-flex w-100 justify-content-between mb-3">
+                        <h5 class="mb-1">Time : {{ alloc['time'][:5] }}</h5>
+                        <a href="/admin/allocation/update?aid={{ alloc['id'] }}&vid={{ alloc['venue_id'] }}" class="btn btn-sm btn-warning" >Update Timing</a>
+                    </div>
+                    <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-1">Seats remaining : <b>{{ alloc['avSeats'] }}</b></p>
+                        <small>Total Seats: <b>{{ alloc['totSeats'] }}</b></small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function delBodyLayout(id, date, time, seats){
+        return `
+            <form>
+            Date : ${date}<br/>
+            Time : ${time.substring(0,5)}<br/>
+            Available seats : ${seats}<br/><br/>
+            Are you sure to delete this timing?<br/>
+        `;
+    }
+
+    function deleteAlloc(){
+        delbt = event.target;
+        id = delbt.dataset.sid
+        date = delbt.dataset.sdate;
+        time = delbt.dataset.stime;
+        avseats = delbt.dataset.avseats;
+        show = delbt.dataset.show;
+        venue = delbt.dataset.venue;
+        vid = delbt.dataset.vid;
+
+        document.getElementById('deleteModalBody').innerHTML = delBodyLayout(id,date,time,avseats);
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+
+        url = "/admin/allocation/delete?aid="+id.toString()+"&sDate="+startDate+"&eDate="+endDate+"&show="+show+"&venue="+venue+"&vid="+vid;
+        document.getElementById('alcDeleteBt').href = url;
+
+    }
+</script>
+{% endblock %}

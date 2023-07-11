@@ -1,0 +1,255 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Allocate Show{% endblock %}
+
+{% block head %}
+<style>
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+    .offcanvas{
+        min-height: 90%;
+    }
+</style>
+{% endblock %}
+
+{% block content %} 
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  {% for category, message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+        <strong class="me-auto text-white">Allocate Show with Venue</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {{ message }}
+      </div>
+    </div>            
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="chShowCanvas" aria-labelledby="offcanvasBottomLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Choose show</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="searchBar">
+            <div class="row">
+                <div class="col-4">
+                    <input class="form-control form-control-sm me-2" id="searchVenueName" type="search" placeholder="Search for shows" aria-label="Search">
+                </div>
+                <div class="col-2">
+                    <button class="btn btn-sm btn-outline-success" type="button" onclick="getShows();">Search</button>
+                </div>        
+            </div>
+            <br/><br/>
+        </div>
+        <div class="row row-cols-2 row-cols-sm-6 g-4" id="chooseShowCards">
+
+        </div>
+
+        <!--
+        {% if showListEmpty is defined %}
+            <br/><br/><br/>
+            <div class="col-6 offset-md-4 justify-content-center">
+              <h3 class="alert alert-primary mb-4">No Shows Available</h3>
+            </div>
+        {% else %}
+          <div class="row row-cols-1 row-cols-sm-4 g-4">
+            {% for show in shows %}
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ show['name'] }}</h5>
+                  <p class="card-text">
+                    <br/>Ticket Price : &nbsp;&#8377;{{ show['ticketPrice'] }}<br/>  
+                    <div class="card-text ratings">
+                      {% for i in range(1,6) %}
+                        {% if(i <= (show['rating']/2)) %}
+                          <i class="fa fa-star rating-color"></i>
+                        {% else %}
+                          <i class="fa fa-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    {% for tagItem in show['tags'] %}
+                    <span class="badge bg-secondary">{{ tagItem['name'] }}</span>&nbsp;
+                    {% endfor %}<br/>
+                    {% for tagItem in show['languages'] %}
+                    <span class="badge bg-success">{{ tagItem['name'] }}</span>&nbsp;
+                    {% endfor %}
+                    </p>
+                  <a href="#" class="btn btn-primary" data-columns="1" data-sname="{{ show['name'] }}" 
+                  onclick="chooseShow();" data-bs-toggle="offcanvas" data-bs-target="#chShowCanvas">Choose Show</a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        -->
+    </div>
+</div>
+
+<div class="body vh-100">
+
+    <div class="container h-custom">
+        <h2>Allocate Show</h2><hr/><br/>
+        <div class="d-flex justify-content-center h-100">
+          <form class="mt-4" action="/admin/allocation/add?venue={{ vname }}" method="post" enctype=multipart/form-data>  
+            <!-- Name input -->
+            <input type="number" value="{{ vid }}" name="venue_id" style="display: none;">
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" name="venueName">For Venue</span>
+                        <input type="text" class="form-control" name="venueName" 
+                        id="venueName" value="{{ vname }}" aria-label="venueName" readonly>
+                    </div>
+                </div>
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" name="showName">For Show</span>
+                        <input type="text" class="form-control" name="showName" id="showName" 
+                        placeholder="Not choosen" aria-label="Show Name" readonly required>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-success btn-md"
+                        style="padding-left: 2.5rem; padding-right: 2.5rem;" 
+                        data-bs-toggle="offcanvas" data-bs-target="#chShowCanvas" aria-controls="chShowCanvas">Choose Show</button>
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div class="row mb-3">
+                <div class="input-group input-group-lg">
+                    <input type="file" class="form-control" id="venueImage" name="venueImage">
+                    <label class="input-group-text" for="venueImage">Upload Image</label>
+                  </div>
+            </div>
+            -->
+
+            
+            <div class="row mb-3">
+                <div class="col-6">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" >Release Date</span>
+                        <input type="date" class="form-control" name="showReleaseDate" 
+                        id="showReleaseDate" aria-label="Show Release Date" min="{{ curDate }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" >Release Time</span>
+                        <input type="time" class="form-control" name="showReleaseTime" 
+                        id="showReleaseTime" min="06:00" max="23:00" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12 col-sm-4">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text">Number of Seats</span>
+                        <input type="number" class="form-control" name="allocSeats" 
+                        id="allocSeats" aria-label="allocSeats" required>
+                    </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-5">
+                    <div class="input-group input-group-md mb-3">
+                        <span class="input-group-text" >Ticket Price</span>
+                        <input type="number" step=".01" class="form-control" name="showTicketPrice" 
+                        id="showTicketPrice" placeholder="450.00" aria-label="Show Ticket Price" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 offset-5">
+                    <button type="submit" class="btn btn-primary btn-md"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Allocate Show Timings</button>
+                </div>
+            </div>
+          </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function chooseShow(){
+        const showName = document.getElementById("showName");
+        show = event.target;
+        sName = show.dataset.sname;
+        showName.value = sName;       
+    }
+
+    function getCardLayout(sName, sDuration){
+        
+        return `<div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">${ sName }</h5>
+                  <p class="card-text">
+                    <br/>Duration : &nbsp;${ sDuration }  
+                    </p>
+                  <a href="#" class="btn btn-primary" data-columns="1" data-sname="${ sName }"
+                  onclick="chooseShow();" data-bs-toggle="offcanvas" data-bs-target="#chShowCanvas">Choose Show</a>
+                </div>
+              </div>
+            </div>`
+
+    }
+
+    function getShows(){
+        
+    document.getElementById('chooseShowCards').innerHTML = `<div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span></div>`;
+
+    query = document.getElementById('searchVenueName').value; 
+        fetch('http://127.0.0.1:5000/api/shows/byName/'+query)
+    .then(async (response) => {
+
+        const data = await response.json();
+        let allCards = "";
+        for(const e of data){
+            allCards += getCardLayout(e.name, e.duration);
+        }
+        document.getElementById('chooseShowCards').innerHTML = allCards;
+        
+    })
+    .catch(error => {
+        document.getElementById('chooseShowCards').innerHTML = "<h3>No shows available</h3>";
+        console.log(error)
+    });
+    }
+
+</script>
+{% endblock %}

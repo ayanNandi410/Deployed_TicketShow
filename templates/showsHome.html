@@ -1,0 +1,151 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Shows Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Show Details</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="deleteModalBody">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="showDeleteBt" class="btn btn-primary">Delete Show</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  {% for category, message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+        <strong class="me-auto text-white">Delete Show</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {{ message }}
+      </div>
+    </div>            
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="container body">
+    <div class="row">
+      <div class="col-12 col-sm-4"><h2>&emsp;Shows</h2></div>
+      <div class="col-12 col-sm-8 d-flex flex-row-reverse">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+  
+              {% if pagination.has_prev %}
+              <li class="page-item">
+                  <a class='page-link' href="{{ url_for('admin.showShows', page=pagination.prev_num) }}">
+                  Previous</a>
+              </li>
+              {% endif %}
+  
+              {% for number in pagination.iter_pages() %}
+              {% if number %}
+              {% if pagination.page != number %}
+              <li class="page-item">
+                  <a  class='page-link'
+                      href="{{ url_for('admin.showShows', page=number) }}">
+                      {{ number }}
+                  </a>
+              </li>
+              {% else %}
+                  <li class="page-item"><a href="#" class='page-link active' aria-disabled="true">{{ number }}</a></li>
+              {% endif %}
+              {% else %}
+              <li class="page-item"><a href="#" class='page-link' aria-disabled="true">...</a></li>
+              {% endif %}
+              {% endfor %}
+  
+              {% if pagination.has_next %}
+              <li class="page-item">
+                  <a  class='page-link'
+                      href="{{ url_for('admin.showShows', page=pagination.next_num) }}">
+                      Next
+                  </a>
+              </li>
+          {% endif %}
+          </ul>
+          </nav>
+      </div>
+    </div>
+    
+    <hr/><br/>
+    <div class="d-flex flex-row-reverse">
+      <a class="btn btn-success" href="/admin/show/add">+ Add Show</a>
+    </div>
+  
+    <br/><br/>
+    <div class="row row-cols-md-3 row-cols-sm-2 row-cols-xs-1 row-cols-1 g-3">    
+    {% for show in pagination.items %}
+        <div class="col">
+          <div class="card p-3" style="width: 18rem; margin-right: 20px;">
+            <div class="card-img-caption d-flex flex-row-reverse">
+              <span class="card-text badge rounded-pill badge-custom">
+                <div class="ratings">
+                  {% for i in range(1,6) %}
+                    {% if(i <= (show['rating']|int)/2) %}
+                      <i class="fa fa-star rating-color"></i>
+                    {% else %}
+                      <i class="fa fa-star-o"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </span>
+              <img src="{{ url_for('static',filename='show.png')}}" class="card-img-top blurImage" height="200px" width="30px" alt="...">
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ show['name'] }}</h5>
+              <div class="card-text mt-3">
+                {% for tag in show['tags'] %}
+                <span class="badge bg-success">{{ tag['name'] }}</span>&nbsp;
+                {% endfor %}
+              </div>
+              <div class="card-text mt-2">
+                {% for lng in show['languages'] %}
+                <span class="badge bg-dark text-white">{{ lng['name'] }}</span>&nbsp;
+                {% endfor %}
+                <span class="badge bg-info text-white">{{ show['duration'] }}</span>&nbsp;
+              </div>
+            </div>
+            <div class="card-footer text-muted">
+              <p>Added on {{ (show['timestamp'] | string )[:19] }}</p>
+              <a href="#" class="btn btn-sm btn-danger" data-columns="2" data-sname="{{ show['name'] }}" 
+              data-vdur="{{ show['duration'] }}" onclick="setShowName();" data-bs-toggle="modal" 
+              data-bs-target="#deleteModal">Delete</a>&emsp14;
+              <a href="/admin/show/update?name={{ show['name'] }}" class="btn btn-sm btn-warning">Update</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function setShowName() {
+    show = event.target;
+    showName = show.dataset.sname;
+    showDur = show.dataset.vdur;
+  const modal = document.getElementById('deleteModalBody');
+  modal.innerText = " Name : "+showName+"\nDuration : "+showDur+"\n\nAre you sure you want to delete?";
+  const delBt = document.getElementById('showDeleteBt');
+  delBt.href = "/admin/deleteShow/"+showName;
+  }
+</script>
+{% endblock %}

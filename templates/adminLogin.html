@@ -1,0 +1,96 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block head %}
+<style>
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header bg-danger">
+            <strong class="me-auto text-white">Admin Login</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>            
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+  <div class="body">
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-center">
+        <div class="col-md-9 col-lg-6 col-xl-5">
+          <div class="card" style="width: 25rem;">
+            <img src="{{ url_for('static',filename='admin.jpg') }}"
+            class="card-img-top" alt="Sample image" width="250px" height="350px">
+            <div class="card-body" style="background-color: rgb(204, 235, 247)">
+              <h5 class="card-title">Sign In</h5>
+              <p class="card-text">Administrator Login</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+
+          <form class="mt-4" action="/adminLogin" method="post">
+            <h3 class="alert alert-primary mb-4">Enter Details</h3> 
+            <!-- Email input -->
+            <div class="form-floating mb-4">
+              <input type="email" id="login_email" name="login_email" class="form-control form-control-lg"
+                placeholder="Enter a valid email address" />
+              <label class="form-label" for="form3Example3">Email address</label>
+            </div>
+  
+            <!-- Password input -->
+            <div class="form-floating mb-3">
+              <input type="password" id="login_passwd" name="login_passwd" class="form-control form-control-lg"
+                placeholder="Enter password" />
+              <label class="form-label" for="form3Example4">Password</label>
+            </div>
+
+            <div class="row">
+              <!-- Checkbox -->
+              <div class="form-check mb-0">
+                <input class="form-check-input me-2" type="checkbox" value="" id="login_remember" name="login_remember"/>
+                <label class="form-check-label" for="form2Example3">
+                  Remember me
+                </label>
+              </div>
+            </div>
+  
+            <div class="d-flex justify-content-center text-lg-start mt-4 pt-2">
+              <button type="submit" class="btn btn-success btn-lg"
+                style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+            </div>
+  
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

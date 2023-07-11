@@ -1,0 +1,24 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Ticket Show{% endblock %}
+
+{% block head %}
+<style>
+  #appNavbar{
+    display: none;
+  }
+  body{
+    background-color: #9acbee;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="height: 100vh;">
+  <div class="row justify-content-md-center" style="margin-top: 10%;">
+    <h1>Sorry, but the page does not exist!!</h1><br/>
+    <h5>Please go back and try again...</h5><br/>
+    <p>{{ errorMessage }}</p>
+  </div>
+</div>
+{% endblock %}

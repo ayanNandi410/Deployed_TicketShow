@@ -1,0 +1,141 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Update Venue{% endblock %}
+
+{% block head %}
+<style>
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="body" style="margin-top: 10%; margin-bottom: 10%;">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+            <strong class="me-auto text-white">Update Venue</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>            
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="container h-custom">
+        <h2>Update Existing Venue</h2><hr/><br/>
+      <div class="d-flex justify-content-center align-items-center h-100">
+
+          <form class="mt-4" action="{{ url_for('admin.updateVenue')}}" method="post" onchange="enableSubmit();" onsubmit="return formValidate();">  
+            
+            <input type="number" value="{{ venue['id'] }}" name="venueId" id="venueId" style="display: none;">
+            
+            <!-- Name input -->
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text" name="venueName">Venue Name</span>
+                        <input type="text" class="form-control" name="venueName" id="venueName" 
+                        placeholder="Allen Hall" value="{{ venue['name'] }}" aria-label="venueName" readonly>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text">Venue Location</span>
+                        <input type="text" class="form-control" name="venueLocation" value="{{ venue['location'] }}" id="venueLocation" placeholder="Beleghata" value="" aria-label="venueLocation" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <div class="input-group input-group-lg mb-3">
+                    <span class="input-group-text">Venue City</span>
+                    <input type="text" class="form-control" name="venueCity" id="venueCity" value="{{ venue['city'] }}" placeholder="Kolkata" value="" aria-label="venueCity" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4">
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text" >Venue Capacity</span>
+                        <input type="number" class="form-control" name="venueCapacity" id="venueCapacity" value="{{ venue['capacity'] }}"
+                        placeholder="450" value="" aria-label="venueCapacity" required>
+                        <div id="capCheck" class="invalid-feedback">&emsp;Capacity of Venue too less</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="input-group input-group-lg mb-3">
+                    <span class="input-group-text">Venue Description</span>
+                    <textarea class="form-control" name="venueDescription" id="venueDescription" value="{{ venue['description'] }}" aria-label="With textarea" required></textarea>
+                    <div id="descCheck" class="invalid-feedback">&emsp;At least 50 characters are necessary</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 offset-5">
+                    <button type="submit" id="submitVenue" class="btn btn-primary btn-lg"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem;" disabled>Update Venue</button>
+                </div>
+            </div>
+  
+          </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function enableSubmit(){
+        document.getElementById('submitVenue').disabled = false;
+    }
+
+    function formValidate(){
+        let result = true;
+
+        let capacity = document.getElementById('venueCapacity');
+        if(capacity.value < 40)
+        {
+            document.getElementById('capCheck').style.display = "block";
+            result = false;
+        }
+        else{
+            document.getElementById('capCheck').style.display = "none";
+        }
+
+        let desc = document.getElementById('venueDescription');
+        if(desc.value.length < 40)
+        {
+            document.getElementById('descCheck').style.display = "block";
+            result = false;
+        }
+        else{
+            document.getElementById('descCheck').style.display = "none";
+        }
+
+        return result;
+    }
+</script>
+{% endblock %}

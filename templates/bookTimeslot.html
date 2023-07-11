@@ -1,0 +1,98 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Ticket Show{% endblock %}
+
+{% block content %}
+<!-- Ticket Price Modal -->
+<div class="modal fade" id="priceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="priceModalTitle">Slot Details</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="priceModalBody">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="bookBt" class="btn btn-primary">Book Tickets</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="body container" style="margin-top: 6%; padding-bottom: 25%;">
+  <div class="row text-center">
+    <h4>Choose your timeslot</h4>`<br/>
+  </div>
+    <div class="row text-center">
+      <div class="col-12 col-sm-6">
+        <h5 class="alert alert-success">Show: {{ show }}</h5>
+      </div>
+      <div class="col-12 col-sm-6">
+        <h5 class="alert alert-success">Venue: {{ venue }}</h5>
+      </div>
+    </div><hr/>
+    {% if emptySlotList is defined %}
+      <br/><br/><h4 class="alert alert-success text-center">No slots Available in this week.<br/> Will be added soon..</h4>
+    {% else %}
+    <div class="card text-center" style="width: fit-content; margin: auto;">
+        <div class="card-header" style="background-color: #1f87c8;">
+          <p class="card-text text-white">Choose Day from below</p>
+          <ul class="nav nav-tabs card-header-tabs" id="timeNavbar">
+            {% for day in dayList %}
+            <li class="nav-item">
+              {% if loop.index == 1 %}
+              <a class="nav-link text-white" data-bs-toggle="collapse" href="#{{ day | string }}" 
+              role="button" aria-expanded="false" aria-controls="{{ day | string }}">{{day}}(Today)</a>
+              {% else %}
+              <a class="nav-link text-white" data-bs-toggle="collapse" href="#{{ day | string }}" 
+              role="button" aria-expanded="false" aria-controls="{{ day | string }}">{{day}}</a>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div id="timeslots">
+        {% for date, slots in slotsDict|dictsort %}
+        <div class="collapse" data-bs-parent="#timeslots" id="{{ dayList[loop.index-1] | string }}">
+          <div class="card card-body">
+            <h5 class="card-title" style="margin-bottom: 10px;">{{ date }} ({{ dayList[loop.index-1] | string }})</h5>
+            <div class="card-text">
+              {% if (slots | length) == 0 %}
+                <p class="alert alert-sm alert-primary" style="width: 40%; margin: auto;">No shows</p>
+              {% else %}
+              {% for timeslot in slots %}
+                {% if timeslot[1] == 0 %}
+                <button class="btn btn-danger position-relative" disabled>{{ timeslot[0][:5] | string }}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                  {{ timeslot[1] | string }}</span></button>&emsp14;
+                  {% elif (timeslot[1] | int) < 15 %}
+                  <button class="btn btn-warning position-relative" onclick=" setModalBody('{{date}}','{{timeslot[0][:5]}}','{{timeslot[2]}}');" data-bs-toggle="modal" data-bs-target="#priceModal">{{ timeslot[0][:5] | string }}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">{{ timeslot[1] | string }}</span></button>&emsp14;
+                  {% else %}
+                  <button class="btn btn-success position-relative" onclick=" setModalBody('{{date}}','{{timeslot[0][:5]}}','{{timeslot[2]}}');" data-bs-toggle="modal" data-bs-target="#priceModal">{{ timeslot[0][:5] | string }}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">{{ timeslot[1] | string }}</span></button>&emsp14;
+                {% endif %}
+              {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function setModalBody(date, timeslot, price) {
+  const modal = document.getElementById('priceModalBody');
+  modal.innerHTML = " Date : "+date+"<br/> Time : "+timeslot+"<br/> Price per person :&nbsp;<span>&#x20B9;</span> "+price+"<br/><br/> Are you sure you want to book?";
+  const bookBt = document.getElementById('bookBt');
+  bookBt.href = "/user/bookTicket?show={{show}}&venue={{venue}}&date="+date+"&time="+timeslot+"&price="+price;
+  }
+</script>
+{% endblock %}

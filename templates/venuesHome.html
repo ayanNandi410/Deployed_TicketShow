@@ -1,0 +1,213 @@
+{% extends "baseTemplate.html" %}
+
+{% block title %}Venues Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    .offcanvas{
+        min-height: 90%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Venue Details</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="deleteModalBody">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="venueDeleteBt" class="btn btn-primary">Delete Venue</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Offcanvas for Shows -->
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasShows" aria-labelledby="offcanvasBottomLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasShowsTitle" ></h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="row row-cols-2 row-cols-sm-5 g-4" id="cardListShows">
+
+    </div>
+  </div>
+</div>
+
+<div class="body container">
+    {% if firstPage is defined %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>Hello {{ user.name }}</strong> ,here are all the venues...
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header {{ 'bg-danger' if category == 'error' else 'bg-success'}}">
+            <strong class="me-auto text-white">Delete Venue</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>            
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="row">
+      <div class="col-12 col-sm-4"><h2>&emsp;Venues</h2></div>
+      <div class="col-12 col-sm-8 d-flex flex-row-reverse">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+  
+              {% if pagination.has_prev %}
+              <li class="page-item">
+                  <a class='page-link' href="{{ url_for('admin.showVenues', page=pagination.prev_num) }}">
+                  Previous</a>
+              </li>
+              {% endif %}
+  
+              {% for number in pagination.iter_pages() %}
+              {% if number %}
+              {% if pagination.page != number %}
+              <li class="page-item">
+                  <a  class='page-link'
+                      href="{{ url_for('admin.showVenues', page=number) }}">
+                      {{ number }}
+                  </a>
+              </li>
+              {% else %}
+                  <li class="page-item"><a href="#" class='page-link active' aria-disabled="true">{{ number }}</a></li>
+              {% endif %}
+              {% else %}
+              <li class="page-item"><a href="#" class='page-link' aria-disabled="true">...</a></li>
+              {% endif %}
+              {% endfor %}
+  
+              {% if pagination.has_next %}
+              <li class="page-item">
+                  <a  class='page-link'
+                      href="{{ url_for('admin.showVenues', page=pagination.next_num) }}">
+                      Next
+                  </a>
+              </li>
+          {% endif %}
+          </ul>
+          </nav>
+      </div>
+    </div>
+    <hr/><br/>
+    <div class="col-12 col-md-2 offset-md-10">
+      <a href="/admin/venue/add" class="btn btn-success">+ Add Venue</a>
+    </div>
+
+
+    <br/><br/>
+    <div class="row row-cols-md-3 row-cols-sm-6 row-cols-1 g-3">    
+      {% for venue in pagination.items %}
+        <div class="col">
+          <div class="card p-3" style="width: 18rem; margin-right: 20px;">
+            <div class="card-img-caption d-flex flex-row-reverse">
+              <span class="card-text badge rounded-pill bg-primary">{{ venue['capacity'] }}</span>
+              <img src="{{ url_for('static',filename='movieHall.png')}}" class="card-img-top blurImage" height="200px" width="30px" alt="...">
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ venue['name'] }}</h5>
+              <p class="card-text">
+                <span class="badge rounded-pill bg-secondary" style="padding: 8px 10px;">{{ venue['location'] }}, {{ venue['city'] }}</span>&emsp13;
+              </p>   
+              <a href="#" data-columns="2" data-vid="{{ venue['id'] | string }}" data-vname="{{ venue['name'] }}" class="btn btn-primary" onclick="getShows();"
+              data-bs-toggle="offcanvas" data-bs-target="#offcanvasShows" aria-controls="offcanvasShows">Shows</a>
+              
+              <a href="/admin/allocation/add?venue={{ venue['name'] }}&vid={{ venue['id'] }}" class="btn btn-primary btn-success">+ Allocate Show</a>
+              
+            </div>
+            <div class="card-footer text-muted">
+              <p>Added on {{ (venue['timestamp'] | string )[:19] }}</p>
+              <a href="#" class="btn btn-sm btn-danger" data-columns="2" data-vName="{{ venue['name'] }}" data-vLoc="{{ venue['location'] }}" data-vid="{{ venue['id'] }}" 
+              onclick="setVenueName();" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a>&emsp14;
+              <a href="/admin/venue/update?id={{ venue['id'] }}" class="btn btn-sm btn-warning">Update</a><br/>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function setVenueName() {
+    venue = event.target;
+    venueName = venue.dataset.vname;
+    venueLoc = venue.dataset.vloc;
+    venueId = venue.dataset.vid;
+
+  const modal = document.getElementById('deleteModalBody');
+  modal.innerText = " Name : "+venueName+"\nLocation : "+venueLoc+"\n\nAre you sure you want to delete?";
+  const delBt = document.getElementById('venueDeleteBt');
+  delBt.href = "/admin/deleteVenue/"+venueId;
+  }
+
+  function getCardLayout(vId,vname, sName, sDuration, sRating){
+        
+        return `<div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">${ sName }</h5>
+              <p class="card-text">
+                Duration : ${ sDuration }
+                </p>
+              <p class="card-text">
+                Rating : ${ sRating } out of 10
+                </p>
+              <a href="/admin/getAllocations?show=${ sName }&venue=${ vname }&vid=${ vId }" class="btn btn-primary">View Timings</a>
+            </div>
+          </div>
+        </div>`
+
+    }
+
+  function getShows(){
+    query = event.target;
+    vId = query.dataset.vid; 
+    vName = query.dataset.vname; 
+
+    document.getElementById('offcanvasShowsTitle').innerHTML = 'Shows allocated for Venue : '+vName;
+    document.getElementById('cardListShows').innerHTML = `<div class="spinner-border text-primary" role="status" style="margin: auto; margin-top:20px;">
+        <span class="visually-hidden">Loading...</span></div>`;
+
+        fetch('http://127.0.0.1:5000/api/shows/byVenue/'+vId)
+    .then(async (response) => {
+
+        const data = await response.json();
+
+        let allCards = "";
+        for(const e of data){
+            allCards += getCardLayout(vId,vName, e.name, e.duration, e.rating);
+          }
+        document.getElementById('cardListShows').innerHTML = allCards;
+        
+    })
+    .catch(error => {
+        document.getElementById('cardListShows').innerHTML = "<h3>No shows alocated</h3>";
+        console.log(error)
+    });
+    }
+
+</script>
+{% endblock %}

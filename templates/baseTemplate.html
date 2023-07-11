@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename='ticket.png') }}">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+  <body>
+    <nav class="navbar navbar-default navbar-expand-lg fixed-top" id="appNavbar" style="background-color: #9acbee; max-height: 10%;">
+        {% if user is defined and user.is_admin() %}
+        <a class="navbar-brand ms-4 me-4" href="{{ url_for('admin.index') }}"><img src="{{ url_for('static', filename='ticket.png') }}" width="40px" height="40px"> BookShow</a>
+        {% elif user is defined and user.is_user() %}
+        <a class="navbar-brand ms-4 me-4" href="{{ url_for('user.userHome') }}"><img src="{{ url_for('static', filename='ticket.png') }}" width="40px" height="40px"> BookShow</a>
+        {% else %}
+        <a class="navbar-brand ms-4 me-4" href="{{ url_for('authn.index') }}"><img src="{{ url_for('static', filename='ticket.png') }}" width="40px" height="40px"> BookShow</a>
+        {% endif %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">BookShow</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              {% block searchBar %}{% endblock%}
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-4">
+                {% if user is not defined %}
+                <li class="nav-item">
+                  <a class="nav-link" href="/userLogin">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/userSignup">Sign Up</a>
+                </li>
+                {% endif %}
+                {% if user is defined and user.is_admin() %}
+                <li class="nav-item">
+                  <a class="nav-link" aria-current="page" href="/admin">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/admin/showVenues">Venues</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/showShows">Shows</a>
+                </li>
+                {% endif %}
+
+                {% if user is defined and user.is_user() %}
+                <li class="nav-item">
+                  <a class="nav-link" aria-current="page" href="/user/userHome">Home</a>
+                </li>
+                <!--
+                <li class="nav-item">
+                  <a class="nav-link" href="/user/venues">Venues</a>
+                </li>
+                -->
+                <li class="nav-item">
+                  <a class="nav-link" href="/user/popularShows">Shows</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/user/bookings">Bookings</a>
+                </li>
+                {% endif %}
+
+                {% if user is defined %}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Other
+                  </a>
+                  <ul class="dropdown-menu">
+                    <!--  -->
+                    <li><a class="dropdown-item" href="/user/userProfile">Profile</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    {% endif %}
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+    </nav>
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+<footer class="text-center text-lg-start bg-white  text-info-emphasis"> 
+    <!-- Copyright -->
+    <div class="text-center p-2" style="background-color: rgba(0, 0, 0, 0.025); width: 100%;">
+      © 2023 Copyright:
+      <a class="text-reset fw-bold" href="#">Ayan Nandi | BS@IIT Madras</a>
+    </div>
+    <!-- Copyright -->
+  </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
