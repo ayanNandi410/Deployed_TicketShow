@@ -1,2 +1,4 @@
-BASE_URL = 'http://127.0.0.1:5000'
+import os
+
+BASE_URL = os.environ.get("HOSTED_URL")
 PER_PAGE_SIZE = 20
