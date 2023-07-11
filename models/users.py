@@ -10,7 +10,7 @@ class User(UserMixin, db.Model):
     __tablename__ = 'Users'
     id = db.Column(db.Integer, primary_key=True) 
     email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(80))
+    password = db.Column(db.String(120))
     name = db.Column(db.String(70))
     access =db.Column(db.Integer)
 
