@@ -9,7 +9,7 @@ from models.users import User
 from main.init_api import getConfiguredApi
 from main.testData import generateTestData
 from main.db import db
-import os
+import os, logging
 
 #template_dir = os.path.abspath(os.getcwd())
 #static_dir =  os.path.abspath(os.getcwd())
@@ -20,6 +20,11 @@ def create_app():
 
     # Local Development Configuration
     app.config.from_object(LocalDevConfig)
+
+    if app.config['LOG_WITH_GUNICORN']:
+        gunicorn_error_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers.extend(gunicorn_error_logger.handlers)
+        app.logger.setLevel(logging.DEBUG)
 
     # blueprint for authentication routes
     app.register_blueprint(userAuth)
