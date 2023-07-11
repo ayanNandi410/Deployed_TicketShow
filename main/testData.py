@@ -162,10 +162,10 @@ def generateTestData(app,db):
         db.drop_all()
         db.create_all()
 
-        #addData(db)
+        addData(db)
 
         db.session.add(User(name='Admin User',email='admin@gmail.com',password=generate_password_hash('admin123', method='sha256'),access=1))
-        #db.session.add(User(name='Test User',email='test@gmail.com',password=generate_password_hash('1234', method='sha256'),access=0))
+        db.session.add(User(name='Test User',email='test@gmail.com',password=generate_password_hash('1234', method='sha256'),access=0))
         db.session.commit()
 
     #@app.before_first_request

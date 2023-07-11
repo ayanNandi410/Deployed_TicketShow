@@ -1,5 +1,6 @@
 from main.constants import BASE_URL
 from flask import Flask, render_template
+from flask_cors import CORS
 from flask_login import LoginManager
 from main.config import LocalDevConfig
 from blueprints.authentication import authn as userAuth
@@ -53,6 +54,8 @@ def create_app():
     generateTestData(app,db)
 
     api = getConfiguredApi(app)
+    CORS(app)
+    
     return app, api
 
 app,api = create_app()
