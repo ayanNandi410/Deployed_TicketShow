@@ -1,4 +1,4 @@
- import os
+import os
 import secrets
 
 baseDir = os.path.abspath(os.getcwd())
