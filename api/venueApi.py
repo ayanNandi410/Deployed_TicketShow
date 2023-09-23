@@ -1,6 +1,6 @@
 from flask_restful import Resource, fields, marshal_with, reqparse
 from flask import request
-from models.admin import Venue, Allocation, Show
+from models.admin import Venue, Allocation, Show, City
 from main.db import db
 from main.validation import NotFoundError, BusinessValidationError
 from sqlalchemy import desc, exc
@@ -78,6 +78,8 @@ class VenueAPI(Resource):
         try:
             new_venue = Venue(name=name,location=location,city=city,capacity=int(capacity),description=desc,timestamp=timestamp)
             db.session.add(new_venue)
+            new_city = City(name=city)
+            db.session.add(new_city)
             db.session.commit()
             return "Success", 201
         except exc.SQLAlchemyError as e:    # Some Database Error occured

@@ -23,6 +23,11 @@ class Language(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20), nullable=False)
 
+class City(db.Model):
+    __tablename__ = 'City'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(20), nullable=False)
+
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
