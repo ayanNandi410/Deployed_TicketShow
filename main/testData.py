@@ -1,4 +1,4 @@
-from models.admin import Show,Tag,Venue,tags,Language,Allocation, BookTicket, MovieReview
+from models.admin import Show,Tag,Venue,tags,Language,Allocation, BookTicket, MovieReview, City
 from models.users import User
 from werkzeug.security import generate_password_hash
 from datetime import date, time, datetime
@@ -20,6 +20,11 @@ def essential_testData(db):
         tamil = Language(name='Tamil')
         telugu = Language(name='Telegu')
         malayalam = Language(name='Malayalam')
+
+        kolkata = City(name="Kolkata")
+        howrah = City(name="Howrah")
+        mumbai = City(name="Mumbai")
+        chennai = City(name="Chennai")
 
         
         venue1 = Venue(name='Inox Forum Mall',location='Kasba',city='Kolkata',capacity=340,description='10/3, Elgin Rd, Sreepally | One of the most popular malls',timestamp=datetime(2023,3,1,11,21,00))
@@ -51,6 +56,11 @@ def essential_testData(db):
         db.session.add(tamil)
         db.session.add(telugu)
         db.session.add(malayalam)
+
+        db.session.add(kolkata)
+        db.session.add(mumbai)
+        db.session.add(chennai)
+        db.session.add(howrah)
 
         show1 = Show(name='Quantamania',rating=10,duration='2 hr 30 min',timestamp=datetime.now())
         show1.tags.append(action)
