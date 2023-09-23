@@ -21,10 +21,10 @@ def essential_testData(db):
         telugu = Language(name='Telegu')
         malayalam = Language(name='Malayalam')
 
-        kolkata = City(name="Kolkata")
-        howrah = City(name="Howrah")
-        mumbai = City(name="Mumbai")
-        chennai = City(name="Chennai")
+        kolkata = City(city="Kolkata")
+        howrah = City(city="Howrah")
+        mumbai = City(city="Mumbai")
+        chennai = City(city="Chennai")
 
         
         venue1 = Venue(name='Inox Forum Mall',location='Kasba',city='Kolkata',capacity=340,description='10/3, Elgin Rd, Sreepally | One of the most popular malls',timestamp=datetime(2023,3,1,11,21,00))

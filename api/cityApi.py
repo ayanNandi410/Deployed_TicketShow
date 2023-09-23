@@ -13,10 +13,10 @@ class GetAllCitiesApi(Resource):
 
     @marshal_with(city_output_fields)
     def get(self):
-        cities = db.session.query(City.name)
+        cities = db.session.query(City.city)
 
         if cities:
-            return list(cities)
+            return cities
         else:
             raise NotFoundError(error_message='No City found',status_code=404,error_code="CN001")
         

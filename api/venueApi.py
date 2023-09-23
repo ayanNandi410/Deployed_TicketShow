@@ -78,7 +78,7 @@ class VenueAPI(Resource):
         try:
             new_venue = Venue(name=name,location=location,city=city,capacity=int(capacity),description=desc,timestamp=timestamp)
             db.session.add(new_venue)
-            new_city = City(name=city)
+            new_city = City(city=city)
             db.session.add(new_city)
             db.session.commit()
             return "Success", 201
